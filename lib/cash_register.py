@@ -27,14 +27,15 @@ class CashRegister:
             print("Not valid discount")
 
     # --- Methods ---
-    def add_item(self, item, price, quantity):
+    def add_item(self, item, price, quantity=1):
         # Add total price (price * quantity) to the running total
         self.total += price * quantity
         
-        # Add the item identifier to the items list
-        self.items.append(item)
+        # Append the item name multiple times matching the quantity count
+        for _ in range(quantity):
+            self.items.append(item)
         
-        # Record transaction object (dictionary) to history
+        # Record transaction details to history
         self.previous_transactions.append({
             "item": item,
             "price": price,
@@ -42,8 +43,8 @@ class CashRegister:
         })
 
     def apply_discount(self):
-        # If no items have been transacted, display message
-        if not self.previous_transactions:
+        # Print message if no transactions exist OR if the discount amount is 0
+        if not self.previous_transactions or self.discount == 0:
             print("There is no discount to apply.")
             return
         
@@ -58,9 +59,10 @@ class CashRegister:
         # Remove and retrieve the last transaction dictionary
         last_transaction = self.previous_transactions.pop()
         
-        # Ensure price reflects correctly by reversing the added item cost
+        # Revert the total calculation
         self.total -= last_transaction["price"] * last_transaction["quantity"]
         
-        # Ensure items reflects correctly by removing the item name
-        if last_transaction["item"] in self.items:
-            self.items.remove(last_transaction["item"])
+        # Remove the item name from the items list matching the exact quantity voided
+        for _ in range(last_transaction["quantity"]):
+            if last_transaction["item"] in self.items:
+                self.items.remove(last_transaction["item"])
